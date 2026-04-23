@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Novel — Inkwell</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <nav class="nav" id="mainNav">
+    <div class="nav-brand"><a href="index.html" class="nav-logo"><em>Ink</em>well</a></div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Library</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="nav-btn" id="themeToggle" aria-label="Toggle theme">🌙</button>
+      <button class="nav-btn nav-toggle" id="navToggle" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+
+  <!-- Novel Header -->
+  <section class="novel-hero">
+    <div class="novel-hero-inner">
+      <div class="novel-cover-wrap">
+        <div class="novel-cover" id="novelCover"></div>
+      </div>
+      <div class="novel-detail">
+        <span class="novel-type-badge" id="novelType"></span>
+        <h1 class="novel-title" id="novelTitle">Loading…</h1>
+        <p class="novel-author">by <strong id="novelAuthor"></strong></p>
+        <p class="novel-synopsis" id="novelSynopsis"></p>
+        <div class="novel-info" id="novelInfo"></div>
+        <div class="novel-tags" id="novelTags"></div>
+        <div class="novel-actions" id="novelActions"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Continue Banner -->
+  <div class="chapter-section" style="padding-bottom:0;">
+    <div class="continue-bar hidden" id="continueBar">
+      <div class="continue-bar-info">
+        <p class="continue-bar-label">📖 Continue Reading</p>
+        <p class="continue-bar-title" id="continueTitle"></p>
+        <p class="continue-bar-sub" id="continueSub"></p>
+      </div>
+      <a href="#" class="btn btn-primary btn-sm" id="continueBtn">Resume →</a>
+    </div>
+  </div>
+
+  <!-- Chapters -->
+  <div class="chapter-section">
+    <div class="section-header">
+      <p class="section-label">Table of Contents</p>
+      <h2 class="section-title" id="chapterCount">Chapters</h2>
+    </div>
+    <div class="chapter-list stagger" id="chapterList"></div>
+  </div>
+
+  <footer class="site-footer">
+    <p class="footer-brand"><em>Ink</em>well</p>
+    <p class="footer-text">Original light novels by Ololade Suberu. All rights reserved.</p>
+    <ul class="footer-links">
+      <li><a href="index.html">Library</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+  </footer>
+
+  <div class="modal-bg" id="shareModalBg"></div>
+  <div class="modal" id="shareModal">
+    <button class="modal-close" id="shareClose">✕</button>
+    <h3 class="modal-title">Share</h3>
+    <div class="share-grid">
+      <button class="share-btn" data-platform="twitter"><span class="s-icon">𝕏</span>Twitter</button>
+      <button class="share-btn" data-platform="whatsapp"><span class="s-icon">💬</span>WhatsApp</button>
+      <button class="share-btn" data-platform="facebook"><span class="s-icon">📘</span>Facebook</button>
+      <button class="share-btn" data-platform="reddit"><span class="s-icon">🔴</span>Reddit</button>
+    </div>
+    <div class="share-copy">
+      <input type="text" id="shareUrl" readonly>
+      <button class="btn btn-primary btn-sm" id="copyLink">Copy</button>
+    </div>
+  </div>
+  <div class="toast-wrap" id="toastWrap"></div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+  <script>document.addEventListener('DOMContentLoaded',()=>{App.init();App.renderNovelPage();});</script>
+</body>
+</html>

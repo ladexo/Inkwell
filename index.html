@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Inkwell — Original Light Novels by Ololade Suberu</title>
+  <meta name="description" content="A premium library of original light novels with stunning inline artwork. Free to read online.">
+  <meta property="og:title" content="Inkwell — Original Light Novels">
+  <meta property="og:description" content="Immersive light novels with inline artwork. Free to read.">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <nav class="nav" id="mainNav">
+    <div class="nav-brand">
+      <a href="index.html" class="nav-logo"><em>Ink</em>well</a>
+    </div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html" class="active">Library</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="nav-btn" id="themeToggle" aria-label="Toggle theme">🌙</button>
+      <button class="nav-btn nav-toggle" id="navToggle" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <p class="hero-badge">Original Light Novels</p>
+    <h1 class="hero-title"><em>Ink</em>well</h1>
+    <p class="hero-sub">Immersive stories with stunning inline artwork — crafted to be experienced, not just read.</p>
+    <div class="hero-actions">
+      <a href="#library" class="btn btn-primary">Browse Library</a>
+      <a href="about.html" class="btn btn-outline">About the Author</a>
+    </div>
+    <div class="hero-stats" id="heroStats"></div>
+  </section>
+
+  <!-- Continue Reading -->
+  <section class="section" style="padding-bottom:0;" id="continueSection">
+    <div class="continue-bar hidden" id="continueBar">
+      <div class="continue-bar-info">
+        <p class="continue-bar-label">📖 Continue Reading</p>
+        <p class="continue-bar-title" id="continueTitle"></p>
+        <p class="continue-bar-sub" id="continueSub"></p>
+      </div>
+      <a href="#" class="btn btn-primary btn-sm" id="continueBtn">Resume →</a>
+    </div>
+  </section>
+
+  <!-- Library -->
+  <section class="section" id="library">
+    <div class="section-header">
+      <p class="section-label">The Collection</p>
+      <h2 class="section-title">All Novels</h2>
+    </div>
+    <div class="novel-grid stagger" id="novelGrid"></div>
+  </section>
+
+  <footer class="site-footer">
+    <p class="footer-brand"><em>Ink</em>well</p>
+    <p class="footer-text">Original light novels by Ololade Suberu. All rights reserved.</p>
+    <ul class="footer-links">
+      <li><a href="index.html">Library</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+  </footer>
+
+  <!-- Share Modal -->
+  <div class="modal-bg" id="shareModalBg"></div>
+  <div class="modal" id="shareModal">
+    <button class="modal-close" id="shareClose">✕</button>
+    <h3 class="modal-title">Share</h3>
+    <div class="share-grid">
+      <button class="share-btn" data-platform="twitter"><span class="s-icon">𝕏</span>Twitter</button>
+      <button class="share-btn" data-platform="whatsapp"><span class="s-icon">💬</span>WhatsApp</button>
+      <button class="share-btn" data-platform="facebook"><span class="s-icon">📘</span>Facebook</button>
+      <button class="share-btn" data-platform="reddit"><span class="s-icon">🔴</span>Reddit</button>
+    </div>
+    <div class="share-copy">
+      <input type="text" id="shareUrl" readonly>
+      <button class="btn btn-primary btn-sm" id="copyLink">Copy</button>
+    </div>
+  </div>
+
+  <div class="toast-wrap" id="toastWrap"></div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+  <script>document.addEventListener('DOMContentLoaded',()=>{App.init();App.renderLibrary();});</script>
+</body>
+</html>

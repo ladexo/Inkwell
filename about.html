@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>About — Inkwell</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <nav class="nav" id="mainNav">
+    <div class="nav-brand"><a href="index.html" class="nav-logo"><em>Ink</em>well</a></div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Library</a></li>
+      <li><a href="about.html" class="active">About</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="nav-btn" id="themeToggle" aria-label="Toggle theme">🌙</button>
+      <button class="nav-btn nav-toggle" id="navToggle" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+
+  <div class="about-hero">
+    <div class="about-avatar">O</div>
+    <h1 class="about-name">Ololade Suberu</h1>
+    <p class="about-role">Author &amp; Illustrator</p>
+  </div>
+
+  <div class="about-body">
+    <h2>The Vision</h2>
+    <p><strong>Inkwell</strong> is a personal publishing platform for original light novels — stories that blend immersive prose with inline artwork to create something that sits between a novel and a graphic novel. Every chapter is designed to be an experience.</p>
+    <p>This isn't just text on a screen. Illustrations appear exactly where they belong — woven into the narrative, bringing pivotal moments to life as you read. The result is a richer, more cinematic form of storytelling.</p>
+
+    <h2>The Creator</h2>
+    <p>Ololade Suberu is a storyteller, artist, and world-builder dedicated to pushing the boundaries of what light novels can be. Every story published here is a labor of love — written, illustrated, and published independently.</p>
+
+    <h2>How to Read</h2>
+    <p>Browse the <a href="index.html">Library</a> to find a novel that interests you. Tap into it, choose a chapter, and start reading. Your progress is saved automatically — come back anytime and pick up exactly where you left off.</p>
+    <p>Use the ⚙ settings button while reading to customize your experience — adjust font size, switch between dark, light, or sepia themes, change the font family, and set your preferred line spacing and column width.</p>
+    <p>Every story is free to read and share. Send the link to anyone and they can start reading instantly — no account needed.</p>
+
+    <div class="text-center mt-4">
+      <a href="index.html" class="btn btn-primary">📖 Browse the Library</a>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <p class="footer-brand"><em>Ink</em>well</p>
+    <p class="footer-text">Original light novels by Ololade Suberu. All rights reserved.</p>
+    <ul class="footer-links">
+      <li><a href="index.html">Library</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+  </footer>
+
+  <div class="toast-wrap" id="toastWrap"></div>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+  <script>document.addEventListener('DOMContentLoaded',()=>{App.init();});</script>
+</body>
+</html>

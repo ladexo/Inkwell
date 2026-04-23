@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Reading — Inkwell</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <nav class="nav" id="mainNav">
+    <div class="nav-brand"><a href="index.html" class="nav-logo"><em>Ink</em>well</a></div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Library</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="nav-btn" id="themeToggle" aria-label="Toggle theme">🌙</button>
+      <button class="nav-btn nav-toggle" id="navToggle" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+
+  <div class="reader-wrap">
+
+    <!-- Reader Toolbar -->
+    <div class="reader-bar">
+      <div class="reader-bar-left">
+        <a href="#" id="backToNovel" aria-label="Back">←</a>
+        <span class="reader-bar-title" id="readerTitle">Loading…</span>
+      </div>
+      <div class="reader-bar-right">
+        <span class="reader-pg" id="readProgress"></span>
+        <button class="nav-btn" id="bookmarkBtn" title="Bookmark">🔖</button>
+        <button class="nav-btn" id="shareBtn" title="Share">↗</button>
+        <button class="nav-btn" id="settingsBtn" title="Reading settings">⚙</button>
+      </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="read-progress">
+      <div class="read-progress-fill" id="progressFill" style="width:0%;"></div>
+    </div>
+
+    <!-- Chapter Content -->
+    <article class="reader-body" id="readerBody">
+      <div class="ch-header" id="chHeader">
+        <p class="ch-header-num" id="chNum"></p>
+        <h1 class="ch-header-title" id="chTitle">Loading…</h1>
+        <div class="ch-header-meta" id="chMeta"></div>
+      </div>
+      <div class="reader-content" id="readerContent">
+        <p style="color:var(--text-muted);text-indent:0;">Loading chapter…</p>
+      </div>
+      <div class="ch-footer" id="chFooter"></div>
+    </article>
+
+  </div>
+
+  <!-- Settings Panel -->
+  <div class="settings-overlay" id="settingsOverlay"></div>
+  <div class="settings-panel" id="settingsPanel">
+    <div class="settings-title">
+      Reading Settings
+      <button class="settings-close" id="settingsClose">✕</button>
+    </div>
+
+    <div class="settings-group">
+      <p class="settings-label">Theme</p>
+      <div class="settings-row" style="gap:14px;">
+        <button class="theme-swatch dark" data-set-theme="dark" title="Dark"></button>
+        <button class="theme-swatch light" data-set-theme="light" title="Light"></button>
+        <button class="theme-swatch sepia" data-set-theme="sepia" title="Sepia"></button>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <p class="settings-label">Font Size</p>
+      <div class="font-size-control">
+        <button id="fontDown">A−</button>
+        <span class="size-display" id="sizeDisplay">115%</span>
+        <button id="fontUp">A+</button>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <p class="settings-label">Font Family</p>
+      <div class="settings-row">
+        <button class="setting-btn active" data-font="'Lora', serif" data-font-id="lora">Serif</button>
+        <button class="setting-btn" data-font="'Source Sans 3', sans-serif" data-font-id="sans">Sans</button>
+        <button class="setting-btn" data-font="'Cormorant Garamond', serif" data-font-id="classic">Classic</button>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <p class="settings-label">Line Height</p>
+      <div class="settings-row">
+        <button class="setting-btn" data-lh="1.7" data-lh-id="compact">Compact</button>
+        <button class="setting-btn active" data-lh="2" data-lh-id="normal">Normal</button>
+        <button class="setting-btn" data-lh="2.4" data-lh-id="relaxed">Relaxed</button>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <p class="settings-label">Width</p>
+      <div class="settings-row">
+        <button class="setting-btn" data-width="560px" data-w-id="narrow">Narrow</button>
+        <button class="setting-btn active" data-width="680px" data-w-id="normal">Normal</button>
+        <button class="setting-btn" data-width="820px" data-w-id="wide">Wide</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share Modal -->
+  <div class="modal-bg" id="shareModalBg"></div>
+  <div class="modal" id="shareModal">
+    <button class="modal-close" id="shareClose">✕</button>
+    <h3 class="modal-title">Share This Chapter</h3>
+    <div class="share-grid">
+      <button class="share-btn" data-platform="twitter"><span class="s-icon">𝕏</span>Twitter</button>
+      <button class="share-btn" data-platform="whatsapp"><span class="s-icon">💬</span>WhatsApp</button>
+      <button class="share-btn" data-platform="facebook"><span class="s-icon">📘</span>Facebook</button>
+      <button class="share-btn" data-platform="reddit"><span class="s-icon">🔴</span>Reddit</button>
+    </div>
+    <div class="share-copy">
+      <input type="text" id="shareUrl" readonly>
+      <button class="btn btn-primary btn-sm" id="copyLink">Copy</button>
+    </div>
+  </div>
+
+  <div class="toast-wrap" id="toastWrap"></div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+  <script>document.addEventListener('DOMContentLoaded',()=>{App.init();App.initReader();});</script>
+</body>
+</html>
