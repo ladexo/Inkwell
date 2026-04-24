@@ -1,0 +1,2274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Inkwell">
+    <title>Inkwell Admin</title>
+    <style>
+/* ========== INKWELL ADMIN — PREMIUM DARK CMS ========== */
+
+:root {
+    --bg: #07070d;
+    --bg-surface: #111119;
+    --bg-card: #18182280;
+    --bg-elevated: #1e1e2a;
+    --border: #2a2a3a;
+    --border-focus: #6366f1;
+    --accent: #6366f1;
+    --accent-glow: #6366f180;
+    --accent-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+    --text: #f0f0f5;
+    --text-secondary: #9494b0;
+    --text-muted: #5a5a78;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --danger-bg: #ef44441a;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.4);
+    --glass: rgba(24, 24, 34, 0.6);
+    --glass-border: rgba(255,255,255,0.06);
+    --transition: 0.25s ease;
+    --nav-height: 72px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+}
+
+body { padding-bottom: calc(var(--nav-height) + 16px); }
+
+/* ========== SCROLLBAR ========== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ========== CONNECTION BAR ========== */
+#connection-bar {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+#conn-status {
+    display: flex; align-items: center; gap: 8px;
+}
+
+#conn-status .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--danger);
+    flex-shrink: 0;
+    box-shadow: 0 0 6px var(--danger);
+}
+#conn-status.connected .dot {
+    background: var(--success);
+    box-shadow: 0 0 6px var(--success);
+}
+
+#conn-text { flex: 1; font-size: 13px; color: var(--text-secondary); }
+
+#conn-toggle-btn, #conn-btn {
+    background: var(--accent-gradient);
+    color: #fff; border: none; border-radius: var(--radius-sm);
+    padding: 8px 16px; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: var(--transition);
+}
+#conn-toggle-btn:active, #conn-btn:active { transform: scale(0.96); }
+
+#conn-form {
+    margin-top: 12px;
+    display: flex; flex-direction: column; gap: 10px;
+}
+#conn-form.hidden { display: none; }
+
+/* ========== FORMS ========== */
+input[type="text"], input[type="password"], input[type="number"], input[type="date"],
+select, textarea {
+    width: 100%;
+    background: var(--bg-elevated);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    padding: 14px 16px;
+    font-size: 16px;
+    font-family: inherit;
+    outline: none;
+    transition: var(--transition);
+    -webkit-appearance: none;
+}
+input:focus, select:focus, textarea:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.readonly-field { opacity: 0.6; cursor: default; }
+
+textarea { resize: vertical; line-height: 1.6; }
+
+label {
+    display: block;
+    font-size: 13px; font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-group { margin-bottom: 20px; }
+
+select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239494b0' fill='none' stroke-width='2'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+}
+
+/* ========== MAIN ========== */
+#app-main { padding: 16px; max-width: 640px; margin: 0 auto; }
+
+.view { display: none; animation: fadeIn 0.3s ease; }
+.view.active { display: block; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.view-title {
+    font-size: 22px; font-weight: 700;
+    margin-bottom: 20px;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.view-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 16px; flex-wrap: wrap;
+}
+.view-header .view-title { margin-bottom: 0; }
+
+/* ========== BUTTONS ========== */
+.action-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--bg-elevated);
+    border: 1.5px solid var(--border);
+    color: var(--text);
+    border-radius: var(--radius-sm);
+    padding: 12px 20px;
+    font-size: 15px; font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: inherit;
+    min-height: 48px;
+}
+.action-btn:active { transform: scale(0.96); }
+.action-btn.primary {
+    background: var(--accent-gradient);
+    border: none; color: #fff;
+    box-shadow: 0 4px 16px var(--accent-glow);
+}
+.action-btn.danger {
+    background: var(--danger-bg);
+    border-color: var(--danger);
+    color: var(--danger);
+}
+.action-btn.full-width { width: 100%; justify-content: center; }
+
+.back-btn {
+    background: none; border: none; color: var(--accent);
+    font-size: 15px; font-weight: 600; cursor: pointer;
+    padding: 8px 0; font-family: inherit;
+}
+
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn-row .action-btn { flex: 1; justify-content: center; }
+
+/* ========== TOGGLE BUTTONS ========== */
+.toggle-group { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.toggle-btn {
+    padding: 10px 16px;
+    border-radius: 100px;
+    border: 1.5px solid var(--border);
+    background: var(--bg-elevated);
+    color: var(--text-secondary);
+    font-size: 14px; font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: inherit;
+    min-height: 44px;
+}
+.toggle-btn.active {
+    background: var(--accent-gradient);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 2px 12px var(--accent-glow);
+}
+
+/* ========== STATS GRID ========== */
+.stats-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    margin-bottom: 24px;
+}
+.stat-card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    padding: 20px 16px;
+    text-align: center;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+.stat-num {
+    font-size: 28px; font-weight: 800;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.stat-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+/* ========== QUICK ACTIONS ========== */
+.quick-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
+.quick-actions .action-btn { flex: 1; justify-content: center; min-width: 120px; }
+
+/* ========== RECENT ACTIVITY ========== */
+#recent-activity h2 { font-size: 16px; margin-bottom: 12px; color: var(--text-secondary); }
+#activity-list { display: flex; flex-direction: column; gap: 8px; }
+.activity-item {
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    font-size: 14px; color: var(--text-secondary);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.activity-item .activity-date { font-size: 12px; color: var(--text-muted); }
+
+/* ========== NOVEL CARDS ========== */
+#novels-grid { display: flex; flex-direction: column; gap: 14px; }
+
+.novel-card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: var(--transition);
+}
+.novel-card:active { transform: scale(0.98); }
+
+.novel-card-inner { display: flex; gap: 14px; padding: 16px; }
+
+.novel-card-cover {
+    width: 70px; height: 100px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    background: var(--bg-elevated);
+    flex-shrink: 0;
+}
+.novel-card-cover.no-cover {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+}
+
+.novel-card-info { flex: 1; min-width: 0; }
+.novel-card-info h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.novel-card-info .novel-type { font-size: 12px; color: var(--text-muted); }
+.novel-card-meta { display: flex; gap: 12px; margin-top: 8px; font-size: 12px; color: var(--text-secondary); }
+
+.status-badge {
+    display: inline-block;
+    padding: 3px 10px; border-radius: 100px;
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.5px;
+}
+.status-badge.ongoing { background: #22c55e20; color: var(--success); }
+.status-badge.completed { background: #6366f120; color: var(--accent); }
+.status-badge.hiatus { background: #f59e0b20; color: var(--warning); }
+.status-badge.published { background: #22c55e20; color: var(--success); }
+.status-badge.draft { background: #f59e0b20; color: var(--warning); }
+.status-badge.coming-soon { background: #f9731620; color: #f97316; }
+
+.novel-card-actions {
+    display: flex; gap: 8px;
+    padding: 0 16px 16px;
+}
+.novel-card-actions button {
+    flex: 1; padding: 10px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: var(--transition);
+    font-family: inherit;
+}
+.novel-card-actions button:active { background: var(--border); }
+
+/* ========== GENRE PICKER ========== */
+.genre-picker {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-bottom: 10px;
+}
+.genre-pill {
+    padding: 8px 14px;
+    border-radius: 100px;
+    border: 1.5px solid var(--border);
+    background: var(--bg-elevated);
+    color: var(--text-secondary);
+    font-size: 13px; cursor: pointer;
+    transition: var(--transition);
+    user-select: none;
+    -webkit-user-select: none;
+}
+.genre-pill.selected {
+    background: var(--accent-gradient);
+    border-color: transparent;
+    color: #fff;
+}
+
+.custom-genre-row { display: flex; gap: 8px; }
+.custom-genre-row input { flex: 1; }
+.custom-genre-row button {
+    background: var(--bg-elevated); border: 1.5px solid var(--border);
+    color: var(--text); border-radius: var(--radius-sm);
+    padding: 10px 16px; font-size: 14px; cursor: pointer;
+    font-family: inherit;
+}
+
+/* ========== COVER UPLOAD ========== */
+.cover-upload {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 32px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    min-height: 160px;
+    display: flex; align-items: center; justify-content: center;
+}
+.cover-upload:active { border-color: var(--accent); }
+.upload-icon { font-size: 40px; display: block; margin-bottom: 8px; }
+#cover-preview-area { color: var(--text-muted); }
+#cover-preview-area img {
+    max-width: 100%; max-height: 200px;
+    border-radius: var(--radius-sm);
+    object-fit: contain;
+}
+
+/* ========== CHAPTERS LIST ========== */
+#chapters-list { display: flex; flex-direction: column; gap: 10px; }
+
+.chapter-item {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex; align-items: center; gap: 14px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+.chapter-num {
+    width: 40px; height: 40px;
+    background: var(--accent-gradient);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 16px;
+    flex-shrink: 0;
+}
+.chapter-info { flex: 1; min-width: 0; }
+.chapter-info h4 { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chapter-info .chapter-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.chapter-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.chapter-actions button {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    width: 38px; height: 38px;
+    font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+}
+
+/* ========== EDITOR ========== */
+#editor-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 12px;
+}
+#editor-info { font-size: 13px; color: var(--text-secondary); }
+#editor-info span { display: block; }
+#ed-novel-name { font-weight: 700; color: var(--text); }
+
+#editor-toolbar {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    margin-bottom: 12px;
+    position: sticky; top: 52px; z-index: 50;
+}
+#editor-toolbar button {
+    min-width: 42px; height: 40px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 15px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: var(--transition);
+    font-family: inherit;
+}
+#editor-toolbar button:active { background: var(--accent); }
+.toolbar-divider { width: 1px; background: var(--border); margin: 0 4px; }
+.toolbar-save { background: var(--accent-gradient) !important; border: none !important; }
+
+#editor {
+    min-height: 50vh;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 20px;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 17px;
+    line-height: 2;
+    color: var(--text);
+    outline: none;
+    overflow-y: auto;
+    word-wrap: break-word;
+}
+#editor:empty::before {
+    content: attr(data-placeholder);
+    color: var(--text-muted);
+    font-style: italic;
+}
+#editor p { margin-bottom: 16px; }
+#editor h2 { font-size: 22px; font-weight: 700; margin: 28px 0 12px; font-family: -apple-system, sans-serif; }
+#editor blockquote {
+    border-left: 3px solid var(--accent);
+    padding-left: 16px;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin: 16px 0;
+}
+#editor hr {
+    border: none; height: 1px;
+    background: var(--border);
+    margin: 32px auto;
+    width: 60%;
+}
+#editor figure {
+    margin: 24px 0; text-align: center;
+}
+#editor figure img {
+    max-width: 100%; border-radius: var(--radius-sm);
+}
+#editor figcaption {
+    font-size: 13px; color: var(--text-muted);
+    margin-top: 8px; font-family: -apple-system, sans-serif;
+    font-style: italic;
+}
+#editor ::selection { background: var(--accent-glow); }
+
+#editor-footer {
+    display: flex; justify-content: space-between;
+    padding: 10px 4px;
+    font-size: 13px; color: var(--text-muted);
+}
+#save-status { color: var(--success); }
+
+/* ========== MEDIA ========== */
+.upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 24px 16px;
+    text-align: center;
+    transition: var(--transition);
+}
+.upload-zone-content { margin-bottom: 16px; }
+.upload-big-icon { font-size: 48px; display: block; margin-bottom: 8px; }
+.upload-zone-content p { color: var(--text-muted); }
+
+.upload-btns { display: flex; gap: 10px; justify-content: center; }
+.upload-btns button {
+    background: var(--bg-elevated);
+    border: 1.5px solid var(--border);
+    color: var(--text); border-radius: var(--radius-sm);
+    padding: 12px 18px; font-size: 14px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    min-height: 48px;
+}
+
+.progress-bar {
+    height: 6px; background: var(--bg-elevated);
+    border-radius: 3px; overflow: hidden;
+    margin: 12px 0 8px;
+}
+.progress-fill {
+    height: 100%; width: 0%;
+    background: var(--accent-gradient);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+#progress-text { font-size: 13px; color: var(--text-muted); }
+
+.gallery-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+}
+.gallery-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--bg-elevated);
+}
+.gallery-item img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: var(--transition);
+}
+.gallery-item:active img { transform: scale(1.05); }
+.gallery-item .gallery-name {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    padding: 20px 6px 6px;
+    font-size: 10px; color: #fff;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.gallery-item .gallery-delete {
+    position: absolute; top: 4px; right: 4px;
+    background: rgba(0,0,0,0.7); border: none;
+    color: var(--danger); font-size: 14px;
+    width: 26px; height: 26px; border-radius: 50%;
+    cursor: pointer; display: none;
+    align-items: center; justify-content: center;
+}
+.gallery-item:hover .gallery-delete { display: flex; }
+
+/* ========== SETTINGS ========== */
+.danger-zone {
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--danger);
+}
+.danger-zone h2 { font-size: 16px; color: var(--danger); margin-bottom: 16px; }
+.danger-zone .action-btn { width: 100%; justify-content: center; margin-bottom: 10px; }
+
+/* ========== BOTTOM NAV ========== */
+#bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: var(--nav-height);
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    z-index: 200;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+.nav-btn {
+    flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 4px;
+    background: none; border: none;
+    color: var(--text-muted);
+    font-size: 10px; font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: inherit;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 8px 0;
+}
+.nav-btn .nav-icon { font-size: 22px; }
+.nav-btn.active { color: var(--accent); }
+.nav-btn.active .nav-icon { transform: scale(1.15); }
+
+/* ========== MODALS ========== */
+#modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 900;
+}
+
+.modal {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    max-height: 85vh;
+    background: var(--bg-surface);
+    border-radius: var(--radius) var(--radius) 0 0;
+    z-index: 1000;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+.modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0;
+    background: var(--bg-surface);
+    z-index: 10;
+}
+.modal-header h2 { font-size: 18px; }
+.modal-header button {
+    background: none; border: none; color: var(--text-muted);
+    font-size: 20px; cursor: pointer; width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+}
+
+.modal-body { padding: 20px; }
+
+.preview-body {
+    font-family: Georgia, serif;
+    font-size: 16px; line-height: 1.9;
+    color: var(--text);
+}
+.preview-body h2 { margin: 24px 0 12px; }
+.preview-body p { margin-bottom: 14px; }
+.preview-body blockquote { border-left: 3px solid var(--accent); padding-left: 16px; color: var(--text-secondary); font-style: italic; }
+.preview-body hr { border: none; height: 1px; background: var(--border); margin: 28px auto; width: 60%; }
+.preview-body figure { margin: 20px 0; text-align: center; }
+.preview-body figure img { max-width: 100%; border-radius: 8px; }
+
+/* Lightbox */
+#modal-lightbox {
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.95);
+    border-radius: 0;
+    max-height: 100vh; height: 100vh;
+}
+#lightbox-img { max-width: 95%; max-height: 90vh; border-radius: 8px; }
+.lightbox-close {
+    position: absolute; top: 16px; right: 16px;
+    background: rgba(255,255,255,0.1); border: none;
+    color: #fff; font-size: 24px;
+    width: 44px; height: 44px; border-radius: 50%;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+}
+
+/* ========== TOAST ========== */
+#toast {
+    position: fixed; top: 16px; left: 16px; right: 16px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 20px;
+    font-size: 14px; font-weight: 500;
+    z-index: 2000;
+    text-align: center;
+    animation: slideDown 0.3s ease;
+    box-shadow: var(--shadow);
+}
+#toast.hidden { display: none; }
+#toast.success { border-color: var(--success); color: var(--success); }
+#toast.error { border-color: var(--danger); color: var(--danger); }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ========== UTILITIES ========== */
+.hidden { display: none !important; }
+.muted { color: var(--text-muted); font-weight: 400; text-transform: none; letter-spacing: 0; }
+
+/* ========== LOADING SPINNER ========== */
+.spinner {
+    width: 24px; height: 24px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 20px auto;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ========== EMPTY STATE ========== */
+.empty-state {
+    text-align: center; padding: 40px 20px;
+    color: var(--text-muted);
+}
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; }
+
+</style>
+</head>
+<body>
+
+<!-- CONNECTION BAR -->
+<div id="connection-bar">
+    <div id="conn-status" class="disconnected">
+        <span class="dot"></span>
+        <span id="conn-text">Not Connected</span>
+        <button id="conn-toggle-btn" onclick="UI.toggleConnectionForm()">Connect</button>
+    </div>
+    <div id="conn-form" class="hidden">
+        <input type="text" id="gh-user" placeholder="GitHub Username" autocapitalize="none" autocorrect="off">
+        <input type="text" id="gh-repo" placeholder="Repository Name" autocapitalize="none" autocorrect="off">
+        <input type="password" id="gh-token" placeholder="Personal Access Token">
+        <button id="conn-btn" onclick="App.connect()">Connect</button>
+    </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<main id="app-main">
+
+    <!-- ========== DASHBOARD ========== -->
+    <section id="view-dashboard" class="view active">
+        <h1 class="view-title">Welcome back, Author ✨</h1>
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-num" id="stat-novels">0</div><div class="stat-label">Novels</div></div>
+            <div class="stat-card"><div class="stat-num" id="stat-chapters">0</div><div class="stat-label">Chapters</div></div>
+            <div class="stat-card"><div class="stat-num" id="stat-words">0</div><div class="stat-label">Words</div></div>
+            <div class="stat-card"><div class="stat-num" id="stat-images">0</div><div class="stat-label">Images</div></div>
+        </div>
+        <div class="quick-actions">
+            <button class="action-btn primary" onclick="UI.showNovelForm()">➕ New Novel</button>
+            <button class="action-btn" onclick="UI.switchTab('write')">✍️ Write Chapter</button>
+            <button class="action-btn" onclick="UI.switchTab('media')">📸 Upload Art</button>
+        </div>
+        <div id="recent-activity">
+            <h2>Recent Activity</h2>
+            <div id="activity-list"><p class="muted">Connect to GitHub to see your activity.</p></div>
+        </div>
+    </section>
+
+    <!-- ========== MY NOVELS ========== -->
+    <section id="view-novels" class="view">
+        <!-- Novel List -->
+        <div id="novels-list-view">
+            <div class="view-header">
+                <h1 class="view-title">My Novels</h1>
+                <button class="action-btn primary" onclick="UI.showNovelForm()">➕ New Novel</button>
+            </div>
+            <div id="novels-grid"></div>
+        </div>
+        <!-- Novel Form -->
+        <div id="novel-form-view" class="hidden">
+            <div class="view-header">
+                <button class="back-btn" onclick="UI.hideNovelForm()">← Back</button>
+                <h1 class="view-title" id="novel-form-title">Create New Novel</h1>
+            </div>
+            <form id="novel-form" onsubmit="return false;">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="nf-title" placeholder="Enter your novel title" oninput="UI.autoSlug()">
+                </div>
+                <div class="form-group">
+                    <label>ID <span class="muted">(auto-generated)</span></label>
+                    <input type="text" id="nf-id" readonly class="readonly-field">
+                </div>
+                <div class="form-group">
+                    <label>Type</label>
+                    <select id="nf-type">
+                        <option value="Light Novel">Light Novel</option>
+                        <option value="Web Novel">Web Novel</option>
+                        <option value="Graphic Novel">Graphic Novel</option>
+                        <option value="Short Story Collection">Short Story Collection</option>
+                        <option value="Poetry Collection">Poetry Collection</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <div class="toggle-group">
+                        <button type="button" class="toggle-btn active" data-val="ongoing" onclick="UI.setToggle(this,'nf-status')">Ongoing</button>
+                        <button type="button" class="toggle-btn" data-val="completed" onclick="UI.setToggle(this,'nf-status')">Completed</button>
+                        <button type="button" class="toggle-btn" data-val="hiatus" onclick="UI.setToggle(this,'nf-status')">Hiatus</button>
+                    </div>
+                    <input type="hidden" id="nf-status" value="ongoing">
+                </div>
+                <div class="form-group">
+                    <label>Genre <span class="muted">(tap to select)</span></label>
+                    <div class="genre-picker" id="genre-picker"></div>
+                    <div class="custom-genre-row">
+                        <input type="text" id="custom-genre" placeholder="Add custom genre...">
+                        <button type="button" onclick="UI.addCustomGenre()">Add</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description <span class="muted" id="desc-counter">0 / 500</span></label>
+                    <textarea id="nf-desc" maxlength="500" rows="4" placeholder="Write a synopsis..." oninput="UI.updateDescCounter()"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Cover Image</label>
+                    <div class="cover-upload" id="cover-upload" onclick="document.getElementById('cover-file').click()">
+                        <div id="cover-preview-area">
+                            <span class="upload-icon">📸</span>
+                            <span>Tap to upload cover image</span>
+                        </div>
+                    </div>
+                    <input type="file" id="cover-file" accept="image/*" class="hidden" onchange="UI.previewCover(this)">
+                </div>
+                <button type="button" class="action-btn primary full-width" onclick="App.saveNovel()">💾 Save Novel</button>
+            </form>
+        </div>
+        <!-- Chapter List -->
+        <div id="chapters-view" class="hidden">
+            <div class="view-header">
+                <button class="back-btn" onclick="UI.hideChapters()">← Back</button>
+                <h1 class="view-title" id="chapters-title">Chapters</h1>
+            </div>
+            <button class="action-btn primary" onclick="UI.showChapterForm()" style="margin-bottom:16px">➕ Add Chapter</button>
+            <div id="chapters-list"></div>
+        </div>
+        <!-- Chapter Form -->
+        <div id="chapter-form-view" class="hidden">
+            <div class="view-header">
+                <button class="back-btn" onclick="UI.hideChapterForm()">← Back</button>
+                <h1 class="view-title" id="chapter-form-title">Add Chapter</h1>
+            </div>
+            <form id="chapter-form" onsubmit="return false;">
+                <div class="form-group">
+                    <label>Chapter Number</label>
+                    <input type="number" id="cf-num" min="1" value="1">
+                </div>
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="cf-title" placeholder="Chapter title">
+                </div>
+                <div class="form-group">
+                    <label>Subtitle</label>
+                    <input type="text" id="cf-subtitle" placeholder="e.g. Chapter One">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <div class="toggle-group">
+                        <button type="button" class="toggle-btn active" data-val="published" onclick="UI.setToggle(this,'cf-status')">Published</button>
+                        <button type="button" class="toggle-btn" data-val="draft" onclick="UI.setToggle(this,'cf-status')">Draft</button>
+                        <button type="button" class="toggle-btn" data-val="coming-soon" onclick="UI.setToggle(this,'cf-status')">Coming Soon</button>
+                    </div>
+                    <input type="hidden" id="cf-status" value="published">
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="cf-date">
+                </div>
+                <div class="btn-row">
+                    <button type="button" class="action-btn primary" onclick="App.saveChapter(true)">💾 Save & Write</button>
+                    <button type="button" class="action-btn" onclick="App.saveChapter(false)">💾 Save</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- ========== WRITE ========== -->
+    <section id="view-write" class="view">
+        <div id="editor-setup" class="">
+            <h1 class="view-title">✍️ The Writer</h1>
+            <div class="form-group">
+                <label>Select Novel</label>
+                <select id="ed-novel" onchange="UI.loadEditorChapters()"><option value="">-- Choose a novel --</option></select>
+            </div>
+            <div class="form-group">
+                <label>Select Chapter</label>
+                <select id="ed-chapter"><option value="">-- Choose a chapter --</option></select>
+            </div>
+            <div class="btn-row">
+                <button class="action-btn primary" onclick="App.openEditor()">✍️ Start Writing</button>
+                <button class="action-btn" onclick="App.loadChapterContent()">📥 Load Existing</button>
+            </div>
+        </div>
+        <div id="editor-area" class="hidden">
+            <div id="editor-header">
+                <button class="back-btn" onclick="UI.closeEditor()">← Back</button>
+                <div id="editor-info">
+                    <span id="ed-novel-name"></span>
+                    <span id="ed-chapter-name"></span>
+                </div>
+            </div>
+            <div id="editor-toolbar">
+                <button type="button" onclick="Editor.exec('bold')" title="Bold"><b>B</b></button>
+                <button type="button" onclick="Editor.exec('italic')" title="Italic"><i>I</i></button>
+                <button type="button" onclick="Editor.insertHeading()" title="Heading">H2</button>
+                <button type="button" onclick="Editor.insertQuote()" title="Quote">❝</button>
+                <div class="toolbar-divider"></div>
+                <button type="button" onclick="Editor.insertBreak()" title="Scene Break">——</button>
+                <button type="button" onclick="Editor.insertImage()" title="Insert Image">🖼️</button>
+                <div class="toolbar-divider"></div>
+                <button type="button" onclick="App.previewChapter()" title="Preview">👁</button>
+                <button type="button" onclick="App.saveChapterContent()" title="Save" class="toolbar-save">💾</button>
+            </div>
+            <div id="editor" contenteditable="true" data-placeholder="Begin your story..."></div>
+            <div id="editor-footer">
+                <span id="word-count">0 words</span>
+                <span id="save-status"></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== MEDIA ========== -->
+    <section id="view-media" class="view">
+        <h1 class="view-title">🖼️ Media Gallery</h1>
+        <div class="form-group">
+            <label>Novel</label>
+            <select id="media-novel" onchange="App.loadMediaGallery()"><option value="">-- Select Novel --</option></select>
+        </div>
+        <div class="form-group">
+            <label>Destination</label>
+            <div class="toggle-group">
+                <button type="button" class="toggle-btn active" data-val="cover" onclick="UI.setToggle(this,'media-dest')">Cover Image</button>
+                <button type="button" class="toggle-btn" data-val="chapter" onclick="UI.setToggle(this,'media-dest');UI.toggleMediaChapter()">Chapter Artwork</button>
+            </div>
+            <input type="hidden" id="media-dest" value="cover">
+        </div>
+        <div class="form-group hidden" id="media-chapter-group">
+            <label>Chapter Number</label>
+            <input type="number" id="media-chapter-num" value="1" min="1">
+        </div>
+        <div class="upload-zone" id="upload-zone">
+            <div class="upload-zone-content">
+                <span class="upload-big-icon">📸</span>
+                <p>Tap to upload</p>
+            </div>
+            <div class="upload-btns">
+                <button type="button" onclick="document.getElementById('media-camera').click()">📸 Take Photo</button>
+                <button type="button" onclick="document.getElementById('media-file').click()">📁 Choose from Library</button>
+            </div>
+            <input type="file" id="media-camera" accept="image/*" capture="environment" class="hidden" onchange="App.uploadMedia(this)">
+            <input type="file" id="media-file" accept="image/*" multiple class="hidden" onchange="App.uploadMedia(this)">
+        </div>
+        <div id="upload-progress" class="hidden">
+            <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+            <span id="progress-text">Uploading...</span>
+        </div>
+        <h2 style="margin-top:24px">Gallery</h2>
+        <div id="media-gallery" class="gallery-grid"></div>
+    </section>
+
+    <!-- ========== SETTINGS ========== -->
+    <section id="view-settings" class="view">
+        <h1 class="view-title">⚙️ Settings</h1>
+        <form onsubmit="return false;">
+            <div class="form-group">
+                <label>Author Name</label>
+                <input type="text" id="set-author" placeholder="Your name">
+            </div>
+            <div class="form-group">
+                <label>Site Title</label>
+                <input type="text" id="set-title" placeholder="Inkwell">
+            </div>
+            <div class="form-group">
+                <label>Site Subtitle</label>
+                <input type="text" id="set-subtitle" placeholder="Stories Worth Reading">
+            </div>
+            <button type="button" class="action-btn primary full-width" onclick="App.saveSettings()">💾 Save Settings</button>
+        </form>
+        <div class="danger-zone">
+            <h2>Danger Zone</h2>
+            <button class="action-btn danger" onclick="App.disconnect()">🔌 Disconnect GitHub</button>
+            <button class="action-btn danger" onclick="App.exportConfig()">📤 Export Config</button>
+        </div>
+    </section>
+
+</main>
+
+<!-- BOTTOM NAV -->
+<nav id="bottom-nav">
+    <button class="nav-btn active" data-tab="dashboard" onclick="UI.switchTab('dashboard')">
+        <span class="nav-icon">📊</span><span class="nav-label">Dashboard</span>
+    </button>
+    <button class="nav-btn" data-tab="novels" onclick="UI.switchTab('novels')">
+        <span class="nav-icon">📚</span><span class="nav-label">Novels</span>
+    </button>
+    <button class="nav-btn" data-tab="write" onclick="UI.switchTab('write')">
+        <span class="nav-icon">✍️</span><span class="nav-label">Write</span>
+    </button>
+    <button class="nav-btn" data-tab="media" onclick="UI.switchTab('media')">
+        <span class="nav-icon">🖼️</span><span class="nav-label">Media</span>
+    </button>
+    <button class="nav-btn" data-tab="settings" onclick="UI.switchTab('settings')">
+        <span class="nav-icon">⚙️</span><span class="nav-label">Settings</span>
+    </button>
+</nav>
+
+<!-- MODALS -->
+<div id="modal-overlay" class="hidden" onclick="UI.closeModal()"></div>
+
+<!-- Preview Modal -->
+<div id="modal-preview" class="modal hidden">
+    <div class="modal-header">
+        <h2>Preview</h2>
+        <button onclick="UI.closeModal()">✕</button>
+    </div>
+    <div id="preview-content" class="modal-body preview-body"></div>
+</div>
+
+<!-- Image Picker Modal -->
+<div id="modal-image-picker" class="modal hidden">
+    <div class="modal-header">
+        <h2>Insert Image</h2>
+        <button onclick="UI.closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+        <div id="picker-gallery" class="gallery-grid"></div>
+        <button class="action-btn" onclick="document.getElementById('picker-upload').click()" style="margin-top:12px">📸 Upload New</button>
+        <input type="file" id="picker-upload" accept="image/*" class="hidden" onchange="App.uploadFromPicker(this)">
+    </div>
+    <div id="picker-caption-area" class="hidden" style="padding:16px">
+        <input type="text" id="picker-caption" placeholder="Caption (optional)">
+        <button class="action-btn primary" onclick="Editor.confirmImageInsert()">Insert</button>
+    </div>
+</div>
+
+<!-- Lightbox Modal -->
+<div id="modal-lightbox" class="modal hidden">
+    <button class="lightbox-close" onclick="UI.closeModal()">✕</button>
+    <img id="lightbox-img" src="">
+</div>
+
+<!-- Delete Confirm Modal -->
+<div id="modal-delete" class="modal hidden">
+    <div class="modal-header"><h2>Confirm Delete</h2><button onclick="UI.closeModal()">✕</button></div>
+    <div class="modal-body">
+        <p id="delete-msg">Are you sure?</p>
+        <div class="btn-row">
+            <button class="action-btn danger" id="delete-confirm-btn">🗑️ Delete</button>
+            <button class="action-btn" onclick="UI.closeModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="hidden"></div>
+
+<script>
+/* ========== INKWELL ADMIN CMS — PREMIUM VISUAL ENGINE ========== */
+
+// ==================== GITHUB API ====================
+const GitHub = {
+    user: '', repo: '', token: '',
+    base: () => `https://api.github.com/repos/${GitHub.user}/${GitHub.repo}/contents/`,
+    headers: () => ({
+        'Authorization': `Bearer ${GitHub.token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+    }),
+
+    async test() {
+        const r = await fetch(GitHub.base(), { headers: GitHub.headers() });
+        return r.ok;
+    },
+
+    async testWrite() {
+        try {
+            const testPath = '.inkwell-test';
+            const encoded = btoa('ok');
+            let sha = null;
+            try {
+                const existing = await fetch(GitHub.base() + testPath, { headers: GitHub.headers() });
+                if (existing.ok) { const d = await existing.json(); sha = d.sha; }
+            } catch(e) {}
+            const body = { message: 'Inkwell write test', content: encoded };
+            if (sha) body.sha = sha;
+            const r = await fetch(GitHub.base() + testPath, {
+                method: 'PUT', headers: GitHub.headers(), body: JSON.stringify(body)
+            });
+            if (!r.ok) {
+                const err = await r.json();
+                throw new Error(err.message || 'Write test failed — status ' + r.status);
+            }
+            return true;
+        } catch(e) {
+            throw e;
+        }
+    },
+
+    async readFile(path) {
+        const r = await fetch(GitHub.base() + path, { headers: GitHub.headers() });
+        if (!r.ok) return null;
+        const data = await r.json();
+        const content = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
+        return { content, sha: data.sha };
+    },
+
+    async writeFile(path, content, message, sha) {
+        const encoded = btoa(unescape(encodeURIComponent(content)));
+        const body = { message, content: encoded };
+        if (sha) body.sha = sha;
+        const r = await fetch(GitHub.base() + path, {
+            method: 'PUT', headers: GitHub.headers(), body: JSON.stringify(body)
+        });
+        if (!r.ok) { const e = await r.json(); throw new Error(e.message || 'Write failed'); }
+        return await r.json();
+    },
+
+    async uploadBinary(path, base64Data, message, sha) {
+        const body = { message, content: base64Data };
+        if (sha) body.sha = sha;
+        const r = await fetch(GitHub.base() + path, {
+            method: 'PUT', headers: GitHub.headers(), body: JSON.stringify(body)
+        });
+        if (!r.ok) throw new Error('Upload failed');
+        return await r.json();
+    },
+
+    async listDir(path) {
+        const r = await fetch(GitHub.base() + path, { headers: GitHub.headers() });
+        if (!r.ok) return [];
+        const data = await r.json();
+        return Array.isArray(data) ? data : [];
+    },
+
+    async deleteFile(path, sha, message) {
+        const r = await fetch(GitHub.base() + path, {
+            method: 'DELETE', headers: GitHub.headers(),
+            body: JSON.stringify({ message, sha })
+        });
+        return r.ok;
+    }
+};
+
+// ==================== CONFIG MANAGER ====================
+const Config = {
+    data: { site: { title: 'Inkwell', subtitle: 'Stories Worth Reading', author: '' }, novels: [] },
+    sha: null,
+
+    async load() {
+        const file = await GitHub.readFile('config.js');
+        if (!file) {
+            Config.sha = null;
+            return;
+        }
+        Config.sha = file.sha;
+        try {
+            // Parse config.js — handles both JSON keys and JS unquoted keys
+            let raw = file.content.trim();
+            // Remove "const CONFIG = " or "var CONFIG = " prefix
+            raw = raw.replace(/^(?:const|let|var)\s+CONFIG\s*=\s*/, '');
+            // Remove trailing semicolon
+            raw = raw.replace(/;\s*$/, '');
+            // Convert JS object literal to JSON (add quotes to unquoted keys)
+            raw = raw.replace(/([{,]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":');
+            // Remove trailing commas
+            raw = raw.replace(/,\s*([}\]])/g, '$1');
+            // Handle single quotes → double quotes (simple cases)
+            raw = raw.replace(/'/g, '"');
+            Config.data = JSON.parse(raw);
+        } catch (e) {
+            // Fallback: try eval-based parsing
+            try {
+                const fn = new Function('return ' + file.content.replace(/^(?:const|let|var)\s+CONFIG\s*=\s*/, '').replace(/;\s*$/, ''));
+                Config.data = fn();
+            } catch (e2) {
+                console.error('Config parse failed:', e2);
+                Toast.show('Failed to parse config.js — starting fresh', 'error');
+            }
+        }
+        if (!Config.data.site) Config.data.site = { title: 'Inkwell', subtitle: 'Stories Worth Reading', author: '' };
+        if (!Config.data.novels) Config.data.novels = [];
+    },
+
+    async save() {
+        const json = JSON.stringify(Config.data, null, 2);
+        const content = `const CONFIG = ${json};`;
+        const result = await GitHub.writeFile('config.js', content, 'Update config via Inkwell Admin', Config.sha);
+        Config.sha = result.content.sha;
+    },
+
+    getNovel(id) { return Config.data.novels.find(n => n.id === id); },
+
+    totalChapters() { return Config.data.novels.reduce((s, n) => s + (n.chapters ? n.chapters.length : 0), 0); },
+    totalWords() { return Config.data.novels.reduce((s, n) => s + (n.chapters ? n.chapters.reduce((cs, c) => cs + (c.wordCount || 0), 0) : 0), 0); },
+    publishedChapters(novel) { return novel.chapters ? novel.chapters.filter(c => c.status === 'published') : []; }
+};
+
+// ==================== TOAST ====================
+const Toast = {
+    timeout: null,
+    show(msg, type = 'success') {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.className = type;
+        clearTimeout(Toast.timeout);
+        const duration = type === 'error' ? 8000 : 3000;
+        Toast.timeout = setTimeout(() => el.classList.add('hidden'), duration);
+        if (type === 'error') console.error('[Inkwell]', msg);
+    }
+};
+
+// ==================== UI ====================
+const UI = {
+    currentTab: 'dashboard',
+    currentNovelId: null,
+    editingNovelId: null,
+    editingChapterIdx: null,
+    selectedGenres: [],
+
+    GENRES: ['Fantasy', 'Sci-Fi', 'Romance', 'Horror', 'Thriller', 'Mystery', 'Adventure',
+             'Drama', 'Comedy', 'Action', 'Slice of Life', 'Supernatural', 'Historical',
+             'Dark Fantasy', 'Dystopian', 'Isekai', 'Cyberpunk', 'Military', 'Psychological'],
+
+    switchTab(tab) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById('view-' + tab).classList.add('active');
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector(`.nav-btn[data-tab="${tab}"]`).classList.add('active');
+        UI.currentTab = tab;
+
+        if (tab === 'novels') UI.renderNovels();
+        if (tab === 'dashboard') UI.renderDashboard();
+        if (tab === 'write') UI.populateEditorSelects();
+        if (tab === 'media') UI.populateMediaSelect();
+
+        // Reset sub-views
+        if (tab === 'novels') {
+            document.getElementById('novels-list-view').classList.remove('hidden');
+            document.getElementById('novel-form-view').classList.add('hidden');
+            document.getElementById('chapters-view').classList.add('hidden');
+            document.getElementById('chapter-form-view').classList.add('hidden');
+        }
+    },
+
+    toggleConnectionForm() {
+        const form = document.getElementById('conn-form');
+        form.classList.toggle('hidden');
+    },
+
+    updateConnectionStatus(connected) {
+        const bar = document.getElementById('conn-status');
+        const text = document.getElementById('conn-text');
+        const btn = document.getElementById('conn-toggle-btn');
+        if (connected) {
+            bar.className = 'connected';
+            text.textContent = `Connected to ${GitHub.user}/${GitHub.repo}`;
+            btn.textContent = '✓';
+            btn.disabled = true;
+            document.getElementById('conn-form').classList.add('hidden');
+        } else {
+            bar.className = 'disconnected';
+            text.textContent = 'Not Connected';
+            btn.textContent = 'Connect';
+            btn.disabled = false;
+        }
+    },
+
+    // ---- Dashboard ----
+    renderDashboard() {
+        document.getElementById('stat-novels').textContent = Config.data.novels.length;
+        document.getElementById('stat-chapters').textContent = Config.totalChapters();
+        const wc = Config.totalWords();
+        document.getElementById('stat-words').textContent = wc > 999 ? (wc / 1000).toFixed(1) + 'k' : wc;
+        document.getElementById('stat-images').textContent = '—';
+
+        // Recent activity
+        const list = document.getElementById('activity-list');
+        const allChapters = [];
+        Config.data.novels.forEach(n => {
+            if (n.chapters) n.chapters.forEach(c => {
+                allChapters.push({ novel: n.title, chapter: c.title, date: c.date, status: c.status });
+            });
+        });
+        allChapters.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        const recent = allChapters.slice(0, 5);
+        if (recent.length === 0) {
+            list.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><p>No chapters yet. Create your first novel!</p></div>';
+        } else {
+            list.innerHTML = recent.map(a => `
+                <div class="activity-item">
+                    <span>${a.novel} — ${a.chapter} <span class="status-badge ${a.status}">${a.status}</span></span>
+                    <span class="activity-date">${a.date || ''}</span>
+                </div>
+            `).join('');
+        }
+    },
+
+    // ---- Novels ----
+    renderNovels() {
+        const grid = document.getElementById('novels-grid');
+        if (Config.data.novels.length === 0) {
+            grid.innerHTML = '<div class="empty-state"><div class="empty-icon">📚</div><p>No novels yet. Tap "New Novel" to start!</p></div>';
+            return;
+        }
+        grid.innerHTML = Config.data.novels.map(n => {
+            const chapCount = n.chapters ? n.chapters.length : 0;
+            const wordCount = n.chapters ? n.chapters.reduce((s, c) => s + (c.wordCount || 0), 0) : 0;
+            const coverSrc = n.cover ? `https://raw.githubusercontent.com/${GitHub.user}/${GitHub.repo}/main/${n.cover}` : '';
+            return `
+                <div class="novel-card">
+                    <div class="novel-card-inner">
+                        ${coverSrc
+                            ? `<img class="novel-card-cover" src="${coverSrc}" alt="${n.title}">`
+                            : `<div class="novel-card-cover no-cover">📖</div>`}
+                        <div class="novel-card-info">
+                            <h3>${n.title}</h3>
+                            <div class="novel-type">${n.type || 'Novel'}</div>
+                            <span class="status-badge ${n.status}">${n.status}</span>
+                            <div class="novel-card-meta">
+                                <span>📖 ${chapCount} ch</span>
+                                <span>✍️ ${wordCount > 999 ? (wordCount/1000).toFixed(1)+'k' : wordCount} words</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="novel-card-actions">
+                        <button onclick="UI.editNovel('${n.id}')">✏️ Edit</button>
+                        <button onclick="UI.showChapters('${n.id}')">📖 Chapters</button>
+                        <button onclick="UI.deleteNovel('${n.id}')">🗑️</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    },
+
+    showNovelForm(novelId) {
+        UI.editingNovelId = novelId || null;
+        document.getElementById('novels-list-view').classList.add('hidden');
+        document.getElementById('novel-form-view').classList.remove('hidden');
+        document.getElementById('chapters-view').classList.add('hidden');
+        document.getElementById('chapter-form-view').classList.add('hidden');
+
+        const title = document.getElementById('novel-form-title');
+        const form = document.getElementById('novel-form');
+
+        // Reset form
+        document.getElementById('nf-title').value = '';
+        document.getElementById('nf-id').value = '';
+        document.getElementById('nf-type').value = 'Light Novel';
+        document.getElementById('nf-status').value = 'ongoing';
+        document.getElementById('nf-desc').value = '';
+        UI.updateDescCounter();
+        UI.selectedGenres = [];
+        document.getElementById('cover-preview-area').innerHTML = '<span class="upload-icon">📸</span><span>Tap to upload cover image</span>';
+        document.getElementById('cover-file').value = '';
+
+        // Set toggle
+        document.querySelectorAll('#novel-form .toggle-group .toggle-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.val === 'ongoing');
+        });
+
+        if (novelId) {
+            title.textContent = 'Edit Novel';
+            const novel = Config.getNovel(novelId);
+            if (novel) {
+                document.getElementById('nf-title').value = novel.title;
+                document.getElementById('nf-id').value = novel.id;
+                document.getElementById('nf-type').value = novel.type || 'Light Novel';
+                document.getElementById('nf-status').value = novel.status || 'ongoing';
+                document.getElementById('nf-desc').value = novel.description || '';
+                UI.selectedGenres = novel.genre ? [...novel.genre] : [];
+                UI.updateDescCounter();
+                // Set status toggle
+                document.querySelectorAll('#novel-form .toggle-group .toggle-btn').forEach(b => {
+                    b.classList.toggle('active', b.dataset.val === (novel.status || 'ongoing'));
+                });
+                // Cover preview
+                if (novel.cover) {
+                    const src = `https://raw.githubusercontent.com/${GitHub.user}/${GitHub.repo}/main/${novel.cover}`;
+                    document.getElementById('cover-preview-area').innerHTML = `<img src="${src}" alt="Cover">`;
+                }
+            }
+        } else {
+            title.textContent = 'Create New Novel';
+        }
+
+        UI.renderGenrePicker();
+    },
+
+    hideNovelForm() {
+        document.getElementById('novels-list-view').classList.remove('hidden');
+        document.getElementById('novel-form-view').classList.add('hidden');
+        UI.editingNovelId = null;
+        UI.renderNovels();
+    },
+
+    editNovel(id) { UI.showNovelForm(id); },
+
+    deleteNovel(id) {
+        const novel = Config.getNovel(id);
+        if (!novel) return;
+        document.getElementById('delete-msg').textContent = `Delete "${novel.title}"? This removes it from your library.`;
+        document.getElementById('delete-confirm-btn').onclick = async () => {
+            Config.data.novels = Config.data.novels.filter(n => n.id !== id);
+            try {
+                await Config.save();
+                Toast.show('Novel deleted');
+            } catch (e) { Toast.show('Delete failed: ' + e.message, 'error'); }
+            UI.closeModal();
+            UI.renderNovels();
+        };
+        UI.openModal('modal-delete');
+    },
+
+    autoSlug() {
+        const title = document.getElementById('nf-title').value;
+        const slug = title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+        document.getElementById('nf-id').value = slug;
+    },
+
+    renderGenrePicker() {
+        const picker = document.getElementById('genre-picker');
+        const allGenres = [...new Set([...UI.GENRES, ...UI.selectedGenres])];
+        picker.innerHTML = allGenres.map(g => {
+            const sel = UI.selectedGenres.includes(g) ? 'selected' : '';
+            return `<span class="genre-pill ${sel}" onclick="UI.toggleGenre('${g}')">${g}</span>`;
+        }).join('');
+    },
+
+    toggleGenre(genre) {
+        const idx = UI.selectedGenres.indexOf(genre);
+        if (idx >= 0) UI.selectedGenres.splice(idx, 1);
+        else UI.selectedGenres.push(genre);
+        UI.renderGenrePicker();
+    },
+
+    addCustomGenre() {
+        const input = document.getElementById('custom-genre');
+        const g = input.value.trim();
+        if (g && !UI.selectedGenres.includes(g)) {
+            UI.selectedGenres.push(g);
+            UI.renderGenrePicker();
+        }
+        input.value = '';
+    },
+
+    updateDescCounter() {
+        const desc = document.getElementById('nf-desc');
+        document.getElementById('desc-counter').textContent = `${desc.value.length} / 500`;
+    },
+
+    previewCover(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('cover-preview-area').innerHTML = `<img src="${e.target.result}" alt="Cover Preview">`;
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    },
+
+    setToggle(btn, hiddenId) {
+        btn.parentElement.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(hiddenId).value = btn.dataset.val;
+    },
+
+    // ---- Chapters ----
+    showChapters(novelId) {
+        UI.currentNovelId = novelId;
+        document.getElementById('novels-list-view').classList.add('hidden');
+        document.getElementById('chapters-view').classList.remove('hidden');
+
+        const novel = Config.getNovel(novelId);
+        document.getElementById('chapters-title').textContent = novel ? novel.title + ' — Chapters' : 'Chapters';
+        UI.renderChapters();
+    },
+
+    hideChapters() {
+        document.getElementById('chapters-view').classList.add('hidden');
+        document.getElementById('novels-list-view').classList.remove('hidden');
+        UI.currentNovelId = null;
+    },
+
+    renderChapters() {
+        const novel = Config.getNovel(UI.currentNovelId);
+        const list = document.getElementById('chapters-list');
+        if (!novel || !novel.chapters || novel.chapters.length === 0) {
+            list.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><p>No chapters yet. Tap "Add Chapter" to start writing!</p></div>';
+            return;
+        }
+        list.innerHTML = novel.chapters.map((c, i) => `
+            <div class="chapter-item">
+                <div class="chapter-num">${c.id}</div>
+                <div class="chapter-info">
+                    <h4>${c.title || 'Untitled'}</h4>
+                    <div class="chapter-sub">${c.subtitle || ''} · ${c.wordCount || 0} words · <span class="status-badge ${c.status}">${c.status}</span></div>
+                </div>
+                <div class="chapter-actions">
+                    <button onclick="UI.writeChapter('${UI.currentNovelId}', ${i})" title="Write">✍️</button>
+                    <button onclick="UI.editChapter(${i})" title="Edit">✏️</button>
+                    <button onclick="UI.deleteChapter(${i})" title="Delete">🗑️</button>
+                </div>
+            </div>
+        `).join('');
+    },
+
+    showChapterForm(chapterIdx) {
+        UI.editingChapterIdx = chapterIdx !== undefined ? chapterIdx : null;
+        document.getElementById('chapters-view').classList.add('hidden');
+        document.getElementById('chapter-form-view').classList.remove('hidden');
+
+        const novel = Config.getNovel(UI.currentNovelId);
+        const title = document.getElementById('chapter-form-title');
+
+        // Reset
+        document.getElementById('cf-title').value = '';
+        document.getElementById('cf-subtitle').value = '';
+        document.getElementById('cf-status').value = 'published';
+        document.getElementById('cf-date').value = new Date().toISOString().split('T')[0];
+
+        // Set toggle
+        document.querySelectorAll('#chapter-form .toggle-group .toggle-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.val === 'published');
+        });
+
+        if (chapterIdx !== undefined && novel && novel.chapters[chapterIdx]) {
+            title.textContent = 'Edit Chapter';
+            const ch = novel.chapters[chapterIdx];
+            document.getElementById('cf-num').value = ch.id;
+            document.getElementById('cf-title').value = ch.title || '';
+            document.getElementById('cf-subtitle').value = ch.subtitle || '';
+            document.getElementById('cf-status').value = ch.status || 'published';
+            document.getElementById('cf-date').value = ch.date || '';
+            document.querySelectorAll('#chapter-form .toggle-group .toggle-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.val === (ch.status || 'published'));
+            });
+        } else {
+            title.textContent = 'Add Chapter';
+            const nextNum = novel && novel.chapters ? novel.chapters.length + 1 : 1;
+            document.getElementById('cf-num').value = nextNum;
+        }
+    },
+
+    hideChapterForm() {
+        document.getElementById('chapter-form-view').classList.add('hidden');
+        document.getElementById('chapters-view').classList.remove('hidden');
+        UI.editingChapterIdx = null;
+        UI.renderChapters();
+    },
+
+    editChapter(idx) { UI.showChapterForm(idx); },
+
+    deleteChapter(idx) {
+        const novel = Config.getNovel(UI.currentNovelId);
+        if (!novel || !novel.chapters[idx]) return;
+        const ch = novel.chapters[idx];
+        document.getElementById('delete-msg').textContent = `Delete "${ch.title || 'Chapter ' + ch.id}"?`;
+        document.getElementById('delete-confirm-btn').onclick = async () => {
+            novel.chapters.splice(idx, 1);
+            try {
+                await Config.save();
+                Toast.show('Chapter deleted');
+            } catch (e) { Toast.show('Failed: ' + e.message, 'error'); }
+            UI.closeModal();
+            UI.renderChapters();
+        };
+        UI.openModal('modal-delete');
+    },
+
+    writeChapter(novelId, chapterIdx) {
+        const novel = Config.getNovel(novelId);
+        if (!novel || !novel.chapters[chapterIdx]) return;
+        const ch = novel.chapters[chapterIdx];
+
+        // Set editor selects
+        document.getElementById('ed-novel').value = novelId;
+        UI.loadEditorChapters();
+        document.getElementById('ed-chapter').value = chapterIdx;
+
+        UI.switchTab('write');
+        // Auto-open editor
+        setTimeout(() => App.openEditor(), 100);
+    },
+
+    // ---- Editor Selects ----
+    populateEditorSelects() {
+        const sel = document.getElementById('ed-novel');
+        const current = sel.value;
+        sel.innerHTML = '<option value="">-- Choose a novel --</option>';
+        Config.data.novels.forEach(n => {
+            sel.innerHTML += `<option value="${n.id}">${n.title}</option>`;
+        });
+        if (current) sel.value = current;
+        UI.loadEditorChapters();
+    },
+
+    loadEditorChapters() {
+        const novelId = document.getElementById('ed-novel').value;
+        const sel = document.getElementById('ed-chapter');
+        sel.innerHTML = '<option value="">-- Choose a chapter --</option>';
+        if (!novelId) return;
+        const novel = Config.getNovel(novelId);
+        if (novel && novel.chapters) {
+            novel.chapters.forEach((c, i) => {
+                sel.innerHTML += `<option value="${i}">Ch ${c.id}: ${c.title || 'Untitled'}</option>`;
+            });
+        }
+    },
+
+    closeEditor() {
+        document.getElementById('editor-area').classList.add('hidden');
+        document.getElementById('editor-setup').classList.remove('hidden');
+    },
+
+    // ---- Media Select ----
+    populateMediaSelect() {
+        const sel = document.getElementById('media-novel');
+        sel.innerHTML = '<option value="">-- Select Novel --</option>';
+        Config.data.novels.forEach(n => {
+            sel.innerHTML += `<option value="${n.id}">${n.title}</option>`;
+        });
+    },
+
+    toggleMediaChapter() {
+        const dest = document.getElementById('media-dest').value;
+        document.getElementById('media-chapter-group').classList.toggle('hidden', dest !== 'chapter');
+    },
+
+    // ---- Modals ----
+    openModal(id) {
+        document.getElementById('modal-overlay').classList.remove('hidden');
+        document.getElementById(id).classList.remove('hidden');
+    },
+
+    closeModal() {
+        document.getElementById('modal-overlay').classList.add('hidden');
+        document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
+    }
+};
+
+// ==================== EDITOR ====================
+const Editor = {
+    selectedImageFile: null,
+
+    exec(cmd) { document.execCommand(cmd, false, null); },
+
+    insertHeading() {
+        document.execCommand('formatBlock', false, '<h2>');
+    },
+
+    insertQuote() {
+        document.execCommand('formatBlock', false, '<blockquote>');
+    },
+
+    insertBreak() {
+        const editor = document.getElementById('editor');
+        const hr = document.createElement('hr');
+        const sel = window.getSelection();
+        if (sel.rangeCount) {
+            const range = sel.getRangeAt(0);
+            range.collapse(false);
+            range.insertNode(hr);
+            // Move cursor after HR
+            const newRange = document.createRange();
+            newRange.setStartAfter(hr);
+            newRange.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(newRange);
+        } else {
+            editor.appendChild(hr);
+        }
+        // Add paragraph after HR
+        const p = document.createElement('p');
+        p.innerHTML = '<br>';
+        hr.parentNode.insertBefore(p, hr.nextSibling);
+        Editor.updateWordCount();
+    },
+
+    insertImage() {
+        // Load images for current chapter from GitHub
+        App.loadPickerImages();
+        UI.openModal('modal-image-picker');
+    },
+
+    selectPickerImage(src, filename) {
+        Editor.selectedImageFile = { src, filename };
+        document.getElementById('picker-caption-area').classList.remove('hidden');
+        document.getElementById('picker-caption').value = '';
+        document.getElementById('picker-caption').focus();
+    },
+
+    confirmImageInsert() {
+        if (!Editor.selectedImageFile) return;
+        const caption = document.getElementById('picker-caption').value.trim();
+        const editor = document.getElementById('editor');
+        const figure = document.createElement('figure');
+        figure.classList.add('illustration');
+        const img = document.createElement('img');
+        img.src = Editor.selectedImageFile.src;
+        img.alt = caption || Editor.selectedImageFile.filename;
+        figure.appendChild(img);
+        if (caption) {
+            const figcap = document.createElement('figcaption');
+            figcap.textContent = caption;
+            figure.appendChild(figcap);
+        }
+
+        const sel = window.getSelection();
+        if (sel.rangeCount) {
+            const range = sel.getRangeAt(0);
+            range.collapse(false);
+            range.insertNode(figure);
+        } else {
+            editor.appendChild(figure);
+        }
+        // Add paragraph after figure
+        const p = document.createElement('p');
+        p.innerHTML = '<br>';
+        figure.parentNode.insertBefore(p, figure.nextSibling);
+
+        Editor.selectedImageFile = null;
+        document.getElementById('picker-caption-area').classList.add('hidden');
+        UI.closeModal();
+        Editor.updateWordCount();
+    },
+
+    updateWordCount() {
+        const editor = document.getElementById('editor');
+        const text = editor.innerText || '';
+        const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+        document.getElementById('word-count').textContent = `${words} words`;
+        return words;
+    },
+
+    getCleanHTML() {
+        const editor = document.getElementById('editor');
+        let html = editor.innerHTML;
+        // Clean up empty divs and normalize
+        html = html.replace(/<div><br\s*\/?><\/div>/gi, '');
+        html = html.replace(/<div>/gi, '<p>').replace(/<\/div>/gi, '</p>');
+        return html.trim();
+    }
+};
+
+// ==================== APP ====================
+const App = {
+    async connect() {
+        const user = document.getElementById('gh-user').value.trim();
+        const repo = document.getElementById('gh-repo').value.trim();
+        const token = document.getElementById('gh-token').value.trim();
+
+        if (!user || !repo || !token) {
+            Toast.show('Please fill in all fields', 'error');
+            return;
+        }
+
+        GitHub.user = user;
+        GitHub.repo = repo;
+        GitHub.token = token;
+
+        const btn = document.getElementById('conn-btn');
+        btn.textContent = 'Connecting...';
+        btn.disabled = true;
+
+        try {
+            const ok = await GitHub.test();
+            if (!ok) throw new Error('Cannot read repo. Check username, repo name, and token.');
+
+            // Test write access
+            try {
+                await GitHub.testWrite();
+            } catch (writeErr) {
+                Toast.show('Token has NO write access. Enable the "repo" scope in GitHub token settings.', 'error');
+                alert('❌ Your token cannot write to this repo.\n\nGo to github.com/settings/tokens, click your token, and make sure the "repo" checkbox is checked.');
+                btn.textContent = 'Connect';
+                btn.disabled = false;
+                return;
+            }
+
+            // Save credentials
+            localStorage.setItem('inkwell-gh', JSON.stringify({ user, repo, token }));
+            UI.updateConnectionStatus(true);
+
+            // Load config
+            await Config.load();
+            UI.renderDashboard();
+            Toast.show('Connected with full read/write access! ✨');
+        } catch (e) {
+            Toast.show('Connection failed: ' + e.message, 'error');
+            alert('❌ Connection failed:\n' + e.message);
+            btn.disabled = false;
+        }
+        btn.textContent = 'Connect';
+        btn.disabled = false;
+    },
+
+    disconnect() {
+        localStorage.removeItem('inkwell-gh');
+        GitHub.user = ''; GitHub.repo = ''; GitHub.token = '';
+        Config.data = { site: { title: 'Inkwell', subtitle: 'Stories Worth Reading', author: '' }, novels: [] };
+        Config.sha = null;
+        UI.updateConnectionStatus(false);
+        document.getElementById('gh-user').value = '';
+        document.getElementById('gh-repo').value = '';
+        document.getElementById('gh-token').value = '';
+        Toast.show('Disconnected');
+        UI.renderDashboard();
+    },
+
+    async saveNovel() {
+        const title = document.getElementById('nf-title').value.trim();
+        const id = document.getElementById('nf-id').value.trim();
+        const type = document.getElementById('nf-type').value;
+        const status = document.getElementById('nf-status').value;
+        const desc = document.getElementById('nf-desc').value.trim();
+        const genres = [...UI.selectedGenres];
+
+        if (!title || !id) {
+            Toast.show('Title is required', 'error');
+            return;
+        }
+
+        // Check for duplicate ID (only for new novels)
+        if (!UI.editingNovelId && Config.getNovel(id)) {
+            Toast.show('A novel with this ID already exists', 'error');
+            return;
+        }
+
+        // Upload cover image if selected
+        const coverFile = document.getElementById('cover-file').files[0];
+        let coverPath = '';
+
+        if (UI.editingNovelId) {
+            const existing = Config.getNovel(UI.editingNovelId);
+            coverPath = existing ? existing.cover || '' : '';
+        }
+
+        if (coverFile) {
+            try {
+                Toast.show('Uploading cover image...');
+                const ext = coverFile.name.split('.').pop().toLowerCase();
+                coverPath = `images/${id}/cover.${ext}`;
+                const base64 = await App.fileToBase64(coverFile);
+                // Check if file exists for SHA
+                let sha = null;
+                try {
+                    const existing = await GitHub.readFile(coverPath);
+                    if (existing) sha = existing.sha;
+                } catch (e) {}
+                await GitHub.uploadBinary(coverPath, base64, `Upload cover for ${title}`, sha);
+            } catch (e) {
+                Toast.show('Cover upload failed: ' + e.message, 'error');
+                return;
+            }
+        }
+
+        const novelData = {
+            id, title, type,
+            cover: coverPath,
+            description: desc,
+            genre: genres,
+            status,
+            chapters: []
+        };
+
+        if (UI.editingNovelId) {
+            // Update existing
+            const idx = Config.data.novels.findIndex(n => n.id === UI.editingNovelId);
+            if (idx >= 0) {
+                novelData.chapters = Config.data.novels[idx].chapters || [];
+                // If ID changed, update
+                Config.data.novels[idx] = novelData;
+            }
+        } else {
+            Config.data.novels.push(novelData);
+        }
+
+        try {
+            await Config.save();
+            Toast.show(UI.editingNovelId ? 'Novel updated! ✨' : 'Novel created! ✨');
+            UI.hideNovelForm();
+        } catch (e) {
+            Toast.show('Save failed: ' + e.message, 'error');
+            alert('❌ Save failed:\n' + e.message + '\n\nIf this says 403 or "Resource not accessible", your token needs the "repo" scope enabled.');
+        }
+    },
+
+    async saveChapter(andWrite) {
+        const num = parseInt(document.getElementById('cf-num').value);
+        const title = document.getElementById('cf-title').value.trim();
+        const subtitle = document.getElementById('cf-subtitle').value.trim();
+        const status = document.getElementById('cf-status').value;
+        const date = document.getElementById('cf-date').value;
+
+        if (!title) { Toast.show('Chapter title is required', 'error'); return; }
+
+        const novel = Config.getNovel(UI.currentNovelId);
+        if (!novel) { Toast.show('Novel not found', 'error'); return; }
+        if (!novel.chapters) novel.chapters = [];
+
+        const chapterData = { id: num, title, subtitle, wordCount: 0, status, date };
+
+        if (UI.editingChapterIdx !== null && novel.chapters[UI.editingChapterIdx]) {
+            chapterData.wordCount = novel.chapters[UI.editingChapterIdx].wordCount || 0;
+            novel.chapters[UI.editingChapterIdx] = chapterData;
+        } else {
+            novel.chapters.push(chapterData);
+        }
+
+        // Sort chapters by id
+        novel.chapters.sort((a, b) => a.id - b.id);
+
+        try {
+            await Config.save();
+            Toast.show('Chapter saved! ✨');
+            if (andWrite) {
+                const chIdx = novel.chapters.findIndex(c => c.id === num);
+                UI.writeChapter(UI.currentNovelId, chIdx >= 0 ? chIdx : novel.chapters.length - 1);
+            } else {
+                UI.hideChapterForm();
+            }
+        } catch (e) {
+            Toast.show('Save failed: ' + e.message, 'error');
+            alert('❌ Chapter save failed:\n' + e.message);
+        }
+    },
+
+    openEditor() {
+        const novelId = document.getElementById('ed-novel').value;
+        const chapterIdx = document.getElementById('ed-chapter').value;
+
+        if (!novelId) { Toast.show('Select a novel first', 'error'); return; }
+        if (chapterIdx === '') { Toast.show('Select a chapter first', 'error'); return; }
+
+        const novel = Config.getNovel(novelId);
+        const chapter = novel.chapters[parseInt(chapterIdx)];
+
+        document.getElementById('ed-novel-name').textContent = novel.title;
+        document.getElementById('ed-chapter-name').textContent = `Ch ${chapter.id}: ${chapter.title}`;
+
+        document.getElementById('editor-setup').classList.add('hidden');
+        document.getElementById('editor-area').classList.remove('hidden');
+
+        document.getElementById('editor').innerHTML = '';
+        document.getElementById('word-count').textContent = '0 words';
+        document.getElementById('save-status').textContent = '';
+
+        document.getElementById('editor').focus();
+    },
+
+    async loadChapterContent() {
+        const novelId = document.getElementById('ed-novel').value;
+        const chapterIdx = document.getElementById('ed-chapter').value;
+
+        if (!novelId || chapterIdx === '') { Toast.show('Select a novel and chapter', 'error'); return; }
+
+        const novel = Config.getNovel(novelId);
+        const chapter = novel.chapters[parseInt(chapterIdx)];
+        const path = `chapters/${novelId}/ch${chapter.id}.html`;
+
+        Toast.show('Loading chapter...');
+
+        try {
+            const file = await GitHub.readFile(path);
+            if (file) {
+                App.openEditor();
+                document.getElementById('editor').innerHTML = file.content;
+                Editor.updateWordCount();
+                Toast.show('Chapter loaded! ✨');
+            } else {
+                Toast.show('No saved content found — start writing!');
+                App.openEditor();
+            }
+        } catch (e) {
+            Toast.show('Load failed: ' + e.message, 'error');
+        }
+    },
+
+    async saveChapterContent() {
+        const novelId = document.getElementById('ed-novel').value;
+        const chapterIdx = parseInt(document.getElementById('ed-chapter').value);
+        const novel = Config.getNovel(novelId);
+        const chapter = novel.chapters[chapterIdx];
+
+        const html = Editor.getCleanHTML();
+        const path = `chapters/${novelId}/ch${chapter.id}.html`;
+        const words = Editor.updateWordCount();
+
+        document.getElementById('save-status').textContent = 'Saving...';
+
+        try {
+            // Check if file exists
+            let sha = null;
+            try {
+                const existing = await GitHub.readFile(path);
+                if (existing) sha = existing.sha;
+            } catch (e) {}
+
+            await GitHub.writeFile(path, html, `Update ${novel.title} Ch ${chapter.id}`, sha);
+
+            // Update word count in config
+            chapter.wordCount = words;
+            await Config.save();
+
+            document.getElementById('save-status').textContent = 'Saved ✓';
+            Toast.show('Chapter saved! ✨');
+            setTimeout(() => { document.getElementById('save-status').textContent = ''; }, 3000);
+        } catch (e) {
+            document.getElementById('save-status').textContent = 'Save failed';
+            Toast.show('Save failed: ' + e.message, 'error');
+            alert('❌ Chapter content save failed:\n' + e.message);
+        }
+    },
+
+    previewChapter() {
+        const html = Editor.getCleanHTML();
+        document.getElementById('preview-content').innerHTML = html;
+        UI.openModal('modal-preview');
+    },
+
+    // ---- Media ----
+    async uploadMedia(input) {
+        const files = input.files;
+        if (!files || files.length === 0) return;
+
+        const novelId = document.getElementById('media-novel').value;
+        if (!novelId) { Toast.show('Select a novel first', 'error'); return; }
+
+        const dest = document.getElementById('media-dest').value;
+        const chapterNum = document.getElementById('media-chapter-num').value;
+
+        document.getElementById('upload-progress').classList.remove('hidden');
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const ext = file.name.split('.').pop().toLowerCase();
+            let path;
+
+            if (dest === 'cover') {
+                path = `images/${novelId}/cover.${ext}`;
+            } else {
+                const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-');
+                path = `chapters/${novelId}/${safeName}`;
+            }
+
+            const pct = Math.round(((i + 1) / files.length) * 100);
+            document.getElementById('progress-fill').style.width = pct + '%';
+            document.getElementById('progress-text').textContent = `Uploading ${i + 1} of ${files.length}...`;
+
+            try {
+                const base64 = await App.fileToBase64(file);
+                let sha = null;
+                try {
+                    const existing = await GitHub.readFile(path);
+                    if (existing) sha = existing.sha;
+                } catch (e) {}
+                await GitHub.uploadBinary(path, base64, `Upload ${file.name}`, sha);
+
+                // Update cover path in config if cover
+                if (dest === 'cover') {
+                    const novel = Config.getNovel(novelId);
+                    if (novel) {
+                        novel.cover = path;
+                        await Config.save();
+                    }
+                }
+            } catch (e) {
+                Toast.show(`Failed to upload ${file.name}: ${e.message}`, 'error');
+            }
+        }
+
+        document.getElementById('upload-progress').classList.add('hidden');
+        document.getElementById('progress-fill').style.width = '0%';
+        Toast.show(`${files.length} file(s) uploaded! ✨`);
+        input.value = '';
+
+        // Refresh gallery
+        App.loadMediaGallery();
+    },
+
+    async loadMediaGallery() {
+        const novelId = document.getElementById('media-novel').value;
+        const gallery = document.getElementById('media-gallery');
+        if (!novelId) { gallery.innerHTML = ''; return; }
+
+        gallery.innerHTML = '<div class="spinner"></div>';
+
+        try {
+            // Load from images/{novelId}/ and chapters/{novelId}/
+            const imageDirFiles = await GitHub.listDir(`images/${novelId}`);
+            const chapterDirFiles = await GitHub.listDir(`chapters/${novelId}`);
+
+            const allImages = [...imageDirFiles, ...chapterDirFiles].filter(f =>
+                f.type === 'file' && /\.(png|jpg|jpeg|webp|gif|svg)$/i.test(f.name)
+            );
+
+            if (allImages.length === 0) {
+                gallery.innerHTML = '<div class="empty-state"><div class="empty-icon">🖼️</div><p>No images yet. Upload some!</p></div>';
+                return;
+            }
+
+            gallery.innerHTML = allImages.map(f => {
+                const src = f.download_url || `https://raw.githubusercontent.com/${GitHub.user}/${GitHub.repo}/main/${f.path}`;
+                return `
+                    <div class="gallery-item" onclick="App.openLightbox('${src}')">
+                        <img src="${src}" alt="${f.name}" loading="lazy">
+                        <span class="gallery-name">${f.name}</span>
+                        <button class="gallery-delete" onclick="event.stopPropagation(); App.deleteMedia('${f.path}', '${f.sha}')">✕</button>
+                    </div>
+                `;
+            }).join('');
+
+            // Update image count on dashboard
+            document.getElementById('stat-images').textContent = allImages.length;
+        } catch (e) {
+            gallery.innerHTML = '<div class="empty-state"><p>Could not load gallery</p></div>';
+        }
+    },
+
+    openLightbox(src) {
+        document.getElementById('lightbox-img').src = src;
+        UI.openModal('modal-lightbox');
+    },
+
+    async deleteMedia(path, sha) {
+        if (!confirm('Delete this image?')) return;
+        try {
+            await GitHub.deleteFile(path, sha, `Delete ${path.split('/').pop()}`);
+            Toast.show('Image deleted');
+            App.loadMediaGallery();
+        } catch (e) {
+            Toast.show('Delete failed', 'error');
+        }
+    },
+
+    async loadPickerImages() {
+        const novelId = document.getElementById('ed-novel').value;
+        const gallery = document.getElementById('picker-gallery');
+        if (!novelId) { gallery.innerHTML = '<p class="muted">No novel selected</p>'; return; }
+
+        gallery.innerHTML = '<div class="spinner"></div>';
+        document.getElementById('picker-caption-area').classList.add('hidden');
+
+        try {
+            const chapterFiles = await GitHub.listDir(`chapters/${novelId}`);
+            const imageFiles = await GitHub.listDir(`images/${novelId}`);
+            const allImages = [...chapterFiles, ...imageFiles].filter(f =>
+                f.type === 'file' && /\.(png|jpg|jpeg|webp|gif|svg)$/i.test(f.name)
+            );
+
+            if (allImages.length === 0) {
+                gallery.innerHTML = '<div class="empty-state"><p>No images. Upload some first!</p></div>';
+                return;
+            }
+
+            gallery.innerHTML = allImages.map(f => {
+                const src = f.download_url || `https://raw.githubusercontent.com/${GitHub.user}/${GitHub.repo}/main/${f.path}`;
+                return `<div class="gallery-item" onclick="Editor.selectPickerImage('${src}', '${f.name}')"><img src="${src}" alt="${f.name}" loading="lazy"><span class="gallery-name">${f.name}</span></div>`;
+            }).join('');
+        } catch (e) {
+            gallery.innerHTML = '<div class="empty-state"><p>Could not load images</p></div>';
+        }
+    },
+
+    async uploadFromPicker(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const novelId = document.getElementById('ed-novel').value;
+        if (!novelId) return;
+
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-');
+        const path = `chapters/${novelId}/${safeName}`;
+
+        Toast.show('Uploading image...');
+        try {
+            const base64 = await App.fileToBase64(file);
+            await GitHub.uploadBinary(path, base64, `Upload ${safeName}`);
+            Toast.show('Image uploaded! ✨');
+            App.loadPickerImages();
+        } catch (e) {
+            Toast.show('Upload failed: ' + e.message, 'error');
+        }
+        input.value = '';
+    },
+
+    // ---- Settings ----
+    loadSettings() {
+        document.getElementById('set-author').value = Config.data.site.author || '';
+        document.getElementById('set-title').value = Config.data.site.title || 'Inkwell';
+        document.getElementById('set-subtitle').value = Config.data.site.subtitle || '';
+    },
+
+    async saveSettings() {
+        Config.data.site.author = document.getElementById('set-author').value.trim();
+        Config.data.site.title = document.getElementById('set-title').value.trim() || 'Inkwell';
+        Config.data.site.subtitle = document.getElementById('set-subtitle').value.trim();
+
+        try {
+            await Config.save();
+            Toast.show('Settings saved! ✨');
+        } catch (e) {
+            Toast.show('Save failed: ' + e.message, 'error');
+            alert('❌ Settings save failed:\n' + e.message);
+        }
+    },
+
+    exportConfig() {
+        const json = JSON.stringify(Config.data, null, 2);
+        const content = `const CONFIG = ${json};`;
+        const blob = new Blob([content], { type: 'application/javascript' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'config.js';
+        a.click();
+        URL.revokeObjectURL(url);
+        Toast.show('Config exported');
+    },
+
+    // ---- Utilities ----
+    fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const result = reader.result;
+                // Remove data:*;base64, prefix
+                const base64 = result.split(',')[1];
+                resolve(base64);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    },
+
+    // ---- Init ----
+    async init() {
+        // Check for saved credentials
+        const saved = localStorage.getItem('inkwell-gh');
+        if (saved) {
+            try {
+                const { user, repo, token } = JSON.parse(saved);
+                GitHub.user = user;
+                GitHub.repo = repo;
+                GitHub.token = token;
+                document.getElementById('gh-user').value = user;
+                document.getElementById('gh-repo').value = repo;
+                document.getElementById('gh-token').value = token;
+
+                const ok = await GitHub.test();
+                if (ok) {
+                    UI.updateConnectionStatus(true);
+                    await Config.load();
+                    UI.renderDashboard();
+                    App.loadSettings();
+                } else {
+                    UI.updateConnectionStatus(false);
+                    Toast.show('Saved connection expired. Please reconnect.', 'error');
+                }
+            } catch (e) {
+                UI.updateConnectionStatus(false);
+            }
+        }
+
+        // Editor word count listener
+        const editor = document.getElementById('editor');
+        editor.addEventListener('input', () => Editor.updateWordCount());
+
+        // Set today's date for chapter form
+        document.getElementById('cf-date').value = new Date().toISOString().split('T')[0];
+
+        // Genre picker
+        UI.renderGenrePicker();
+    }
+};
+
+// ==================== BOOT ====================
+document.addEventListener('DOMContentLoaded', App.init);
+
+</script>
+</body>
+</html>
